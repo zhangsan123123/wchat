@@ -1,0 +1,82 @@
+<extend name="Public/base"/>
+
+<block name="body">
+	<div class="main-title">
+		<h2>导航管理</h2>
+	</div>
+
+	<div class="cf">
+		<a class="btn" href="{:U('add','pid='.$pid)}">新 增</a>
+		<button class="btn list_sort" url="{:U('sort',array('pid'=>I('get.pid',0)),'')}">排序</button>
+	</div>
+
+	<div class="data-table table-striped">
+		<table>
+			<thead>
+				<tr>
+					<th class="row-selected">
+						<input class="checkbox check-all" type="checkbox">
+					</th>
+					<th class="">报修单号</th>
+					<th class="">报修人</th>
+					<th class="">电话</th>
+					<th class="">地址</th>
+					<th class="">问题</th>
+					<th class="">报修时间</th>
+					<th class="">状态</th>
+					<th class="">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<notempty name="list">
+				<volist name="list" id="repair">
+
+					<tr>
+						<td><input class="ids row-selected" type="checkbox" name="" id="" value="{$repair['id']}"> </td>
+						<td>{$repair.sno}</td>
+						<td>{$repair.name}</td>
+						<td>{$repair.tel}</td>
+						<td>{$repair.address}</td>
+						<td>{$repair.content}</td>
+						<td>{$repair.time|date='Y-m-d H:i:s',###}</td>
+						<td>{$repair.status|getStatus}</td>
+						<td>
+							<a class="btn" href="{:U('del?id='.$repair['id'])}">删 除</a>
+							<a class="btn" href="{:U('edit?id='.$repair['id'].'&pid='.$pid)}">编 辑</a>
+							<a class="text-info" href="">查看详情</a>
+					</tr>
+				</volist>
+				<else/>
+				<td colspan="6" class="text-center"> aOh! 暂时还没有内容! </td>
+				</notempty>
+			</tbody>
+		</table>
+		<div class="page">
+			{$page}
+		</div>
+	</div>
+</block>
+
+<block name="script">
+<script type="text/javascript">
+    $(function() {
+    	//点击排序
+    	$('.list_sort').click(function(){
+    		var url = $(this).attr('url');
+    		var ids = $('.ids:checked');
+    		var param = '';
+    		if(ids.length > 0){
+    			var str = new Array();
+    			ids.each(function(){
+    				str.push($(this).val());
+    			});
+    			param = str.join(',');
+    		}
+
+    		if(url != undefined && url != ''){
+    			window.location.href = url + '/ids/' + param;
+    		}
+    	});
+    });
+</script>
+</block>
