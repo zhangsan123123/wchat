@@ -1,0 +1,33 @@
+<extend name="Base/layout"/>
+<block name="body">
+    <div class="main">
+        <div class="container-fluid">
+                <volist name="list" id="estate">
+            <div class="row noticeList">
+                <a href="notice-detail.html">
+                    <div class="col-xs-2">
+                        <img class="noticeImg" src="{$estate.cover_id|get_cover ='path'}" />
+                    </div>
+                    <div class="col-xs-10">
+                        <p class="title">{$estate.title}</p>
+                        <p class="intro">{$estate.description}</p>
+                        <p class="info">浏览: {$estate.view} <span class="pull-right">{$estate.create_time|date='Y-m-d H:i:s',###}</span> </p>
+                    </div>
+                </a>
+            </div>
+                </volist>
+        </div>
+        <div class="text-center"><button class="btn btn-info ajax-get-self">获取更多多~~</button></div>
+    </div>
+    </block>
+<block name="script">
+        <script type="application/javascript">
+            $('.ajax-get-self').click(function(){
+
+
+
+            })
+
+            </script>
+
+</block>
