@@ -85,58 +85,75 @@
             
 
             
-	<!-- 标题栏 -->
 	<div class="main-title">
-		<h2>模型列表</h2>
-
+		<h2><?php echo ($info['id']?'编辑':'新增'); ?>配置</h2>
 	</div>
-    <div class="tools">
-        <a class="btn" href="<?php echo U('Model/add');?>">新 增</a>
-        <button class="btn ajax-post" target-form="ids" url="<?php echo U('Model/setStatus',array('status'=>1));?>">启 用</button>
-        <button class="btn ajax-post" target-form="ids" url="<?php echo U('Model/setStatus',array('status'=>0));?>">禁 用</button>
-        <a class="btn" href="<?php echo U('Model/generate');?>">生 成</a>
-    </div>
-
-	<!-- 数据列表 -->
-	<div class="data-table">
-        <div class="data-table table-striped">
-<table class="">
-    <thead>
-        <tr>
-		<th class="row-selected row-selected"><input class="check-all" type="checkbox"/></th>
-		<th class="">编号</th>
-		<th class="">标识</th>
-		<th class="">名称</th>
-		<th class="">创建时间</th>
-		<th class="">状态</th>
-		<th class="">操作</th>
-		</tr>
-    </thead>
-    <tbody>
-	<?php if(!empty($_list)): if(is_array($_list)): $i = 0; $__LIST__ = $_list;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?><tr>
-            <td><input class="ids" type="checkbox" name="ids[]" value="<?php echo ($vo["id"]); ?>" /></td>
-			<td><?php echo ($vo["id"]); ?> </td>
-			<td><?php echo ($vo["name"]); ?></td>
-			<td><a data-id="<?php echo ($vo["id"]); ?>" href="<?php echo U('model/edit?id='.$vo['id']);?>"><?php echo ($vo["title"]); ?></a></td>
-			<td><span><?php echo (time_format($vo["create_time"])); ?></span></td>
-			<td><?php echo ($vo["status_text"]); ?></td>
-			<td>
-				<a href="<?php echo U('think/lists?model='.$vo['name']);?>">数据</a>
-				<a href="<?php echo U('model/setstatus?ids='.$vo['id'].'&status='.abs(1-$vo['status']));?>" class="ajax-get"><?php echo (show_status_op($vo["status"])); ?></a>
-				<a href="<?php echo U('model/edit?id='.$vo['id']);?>">编辑</a>
-				<a href="<?php echo U('model/del?ids='.$vo['id']);?>" class="confirm ajax-get">删除</a>
-            </td>
-		</tr><?php endforeach; endif; else: echo "" ;endif; ?>
-		<?php else: ?>
-		<td colspan="7" class="text-center"> aOh! 暂时还没有内容! </td><?php endif; ?>
-	</tbody>
-    </table>
-
-        </div>
-    </div>
-    <div class="page">
-        <?php echo ($_page); ?>
-    </div>
+	<form action="<?php echo U();?>" method="post" class="form-horizontal">
+		<div class="form-item">
+			<label class="item-label">配置标识<span class="check-tips">（用于C函数调用，只能使用英文且不能重复）</span></label>
+			<div class="controls">
+				<input type="text" class="text input-large" name="name" value="<?php echo ((isset($info["name"]) && ($info["name"] !== ""))?($info["name"]):''); ?>">
+			</div>
+		</div>
+		<div class="form-item">
+			<label class="item-label">配置标题<span class="check-tips">（用于后台显示的配置标题）</span></label>
+			<div class="controls">
+				<input type="text" class="text input-large" name="title" value="<?php echo ((isset($info["title"]) && ($info["title"] !== ""))?($info["title"]):''); ?>">
+			</div>
+		</div>
+		<div class="form-item">
+			<label class="item-label">排序<span class="check-tips">（用于分组显示的顺序）</span></label>
+			<div class="controls">
+				<input type="text" class="text input-small" name="sort" value="<?php echo ((isset($info["sort"]) && ($info["sort"] !== ""))?($info["sort"]):0); ?>">
+			</div>
+		</div>
+		<div class="form-item">
+			<label class="item-label">配置类型<span class="check-tips">（系统会根据不同类型解析配置值）</span></label>
+			<div class="controls">
+				<select name="type">
+					<?php if(is_array(C("CONFIG_TYPE_LIST"))): $i = 0; $__LIST__ = C("CONFIG_TYPE_LIST");if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$type): $mod = ($i % 2 );++$i;?><option value="<?php echo ($key); ?>"><?php echo ($type); ?></option><?php endforeach; endif; else: echo "" ;endif; ?>
+				</select>
+			</div>
+		</div>
+		<div class="form-item">
+			<label class="item-label">配置分组<span class="check-tips">（配置分组 用于批量设置 不分组则不会显示在系统设置中）</span></label>
+			<div class="controls">
+				<select name="group">
+					<option value="0">不分组</option>
+					<?php if(is_array(C("CONFIG_GROUP_LIST"))): $i = 0; $__LIST__ = C("CONFIG_GROUP_LIST");if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$group): $mod = ($i % 2 );++$i;?><option value="<?php echo ($key); ?>"><?php echo ($group); ?></option><?php endforeach; endif; else: echo "" ;endif; ?>
+				</select>
+			</div>
+		</div>
+		<div class="form-item">
+			<label class="item-label">配置值<span class="check-tips">（配置值）</span></label>
+			<div class="controls">
+				<label class="textarea input-large">
+					<textarea name="value"><?php echo ((isset($info["value"]) && ($info["value"] !== ""))?($info["value"]):''); ?></textarea>
+				</label>
+			</div>
+		</div>
+		<div class="form-item">
+			<label class="item-label">配置项<span class="check-tips">（如果是枚举型 需要配置该项）</span></label>
+			<div class="controls">
+				<label class="textarea input-large">
+					<textarea name="extra"><?php echo ((isset($info["extra"]) && ($info["extra"] !== ""))?($info["extra"]):''); ?></textarea>
+				</label>
+			</div>
+		</div>
+		<div class="form-item">
+			<label class="item-label">说明<span class="check-tips">（配置详细说明）</span></label>
+			<div class="controls">
+				<label class="textarea input-large">
+					<textarea name="remark"><?php echo ((isset($info["remark"]) && ($info["remark"] !== ""))?($info["remark"]):''); ?></textarea>
+				</label>
+			</div>
+		</div>
+		<div class="form-item">
+			<input type="hidden" name="id" value="<?php echo ((isset($info["id"]) && ($info["id"] !== ""))?($info["id"]):''); ?>">
+			<button class="btn submit-btn ajax-post" id="submit" type="submit" target-form="form-horizontal">确 定</button>
+			<button class="btn btn-return" onclick="javascript:history.back(-1);return false;">返 回</button>
+		</div>
+	</form>
 
         </div>
         <div class="cont-ft">
@@ -231,23 +248,12 @@
         }();
     </script>
     
-    <script src="/Public/static/thinkbox/jquery.thinkbox.js"></script>
-    <script type="text/javascript">
-    $(function(){
-    	$("#search").click(function(){
-    		var url = $(this).attr('url');
-    		var status = $('select[name=status]').val();
-    		var search = $('input[name=search]').val();
-    		if(status != ''){
-    			url += '/status/' + status;
-    		}
-    		if(search != ''){
-    			url += '/search/' + search;
-    		}
-    		window.location.href = url;
-    	});
-})
-</script>
+	<script type="text/javascript">
+		Think.setValue("type", <?php echo ((isset($info["type"]) && ($info["type"] !== ""))?($info["type"]):0); ?>);
+		Think.setValue("group", <?php echo ((isset($info["group"]) && ($info["group"] !== ""))?($info["group"]):0); ?>);
+		//导航高亮
+		highlight_subnav('<?php echo U('Config/index');?>');
+	</script>
 
 </body>
 </html>

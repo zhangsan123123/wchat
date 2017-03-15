@@ -85,58 +85,26 @@
             
 
             
-	<!-- 标题栏 -->
 	<div class="main-title">
-		<h2>模型列表</h2>
-
+		<h2>分类管理</h2>
 	</div>
-    <div class="tools">
-        <a class="btn" href="<?php echo U('Model/add');?>">新 增</a>
-        <button class="btn ajax-post" target-form="ids" url="<?php echo U('Model/setStatus',array('status'=>1));?>">启 用</button>
-        <button class="btn ajax-post" target-form="ids" url="<?php echo U('Model/setStatus',array('status'=>0));?>">禁 用</button>
-        <a class="btn" href="<?php echo U('Model/generate');?>">生 成</a>
-    </div>
 
-	<!-- 数据列表 -->
-	<div class="data-table">
-        <div class="data-table table-striped">
-<table class="">
-    <thead>
-        <tr>
-		<th class="row-selected row-selected"><input class="check-all" type="checkbox"/></th>
-		<th class="">编号</th>
-		<th class="">标识</th>
-		<th class="">名称</th>
-		<th class="">创建时间</th>
-		<th class="">状态</th>
-		<th class="">操作</th>
-		</tr>
-    </thead>
-    <tbody>
-	<?php if(!empty($_list)): if(is_array($_list)): $i = 0; $__LIST__ = $_list;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?><tr>
-            <td><input class="ids" type="checkbox" name="ids[]" value="<?php echo ($vo["id"]); ?>" /></td>
-			<td><?php echo ($vo["id"]); ?> </td>
-			<td><?php echo ($vo["name"]); ?></td>
-			<td><a data-id="<?php echo ($vo["id"]); ?>" href="<?php echo U('model/edit?id='.$vo['id']);?>"><?php echo ($vo["title"]); ?></a></td>
-			<td><span><?php echo (time_format($vo["create_time"])); ?></span></td>
-			<td><?php echo ($vo["status_text"]); ?></td>
-			<td>
-				<a href="<?php echo U('think/lists?model='.$vo['name']);?>">数据</a>
-				<a href="<?php echo U('model/setstatus?ids='.$vo['id'].'&status='.abs(1-$vo['status']));?>" class="ajax-get"><?php echo (show_status_op($vo["status"])); ?></a>
-				<a href="<?php echo U('model/edit?id='.$vo['id']);?>">编辑</a>
-				<a href="<?php echo U('model/del?ids='.$vo['id']);?>" class="confirm ajax-get">删除</a>
-            </td>
-		</tr><?php endforeach; endif; else: echo "" ;endif; ?>
-		<?php else: ?>
-		<td colspan="7" class="text-center"> aOh! 暂时还没有内容! </td><?php endif; ?>
-	</tbody>
-    </table>
-
-        </div>
-    </div>
-    <div class="page">
-        <?php echo ($_page); ?>
-    </div>
+	<!-- 表格列表 -->
+	<div class="tb-unit posr">
+		<div class="tb-unit-bar">
+			<a class="btn" href="<?php echo U('add');?>">新 增</a>
+		</div>
+		<div class="category">
+			<div class="hd cf">
+				<div class="fold">折叠</div>
+				<div class="order">排序</div>
+				<div class="order">发布</div>
+				<div class="name">名称</div>
+			</div>
+			<?php echo R('Category/tree', array($tree));?>
+		</div>
+	</div>
+	<!-- /表格列表 -->
 
         </div>
         <div class="cont-ft">
@@ -231,23 +199,59 @@
         }();
     </script>
     
-    <script src="/Public/static/thinkbox/jquery.thinkbox.js"></script>
-    <script type="text/javascript">
-    $(function(){
-    	$("#search").click(function(){
-    		var url = $(this).attr('url');
-    		var status = $('select[name=status]').val();
-    		var search = $('input[name=search]').val();
-    		if(status != ''){
-    			url += '/status/' + status;
-    		}
-    		if(search != ''){
-    			url += '/search/' + search;
-    		}
-    		window.location.href = url;
-    	});
-})
-</script>
+	<script type="text/javascript">
+		(function($){
+			/* 分类展开收起 */
+			$(".category dd").prev().find(".fold i").addClass("icon-unfold")
+				.click(function(){
+					var self = $(this);
+					if(self.hasClass("icon-unfold")){
+						self.closest("dt").next().slideUp("fast", function(){
+							self.removeClass("icon-unfold").addClass("icon-fold");
+						});
+					} else {
+						self.closest("dt").next().slideDown("fast", function(){
+							self.removeClass("icon-fold").addClass("icon-unfold");
+						});
+					}
+				});
+
+			/* 三级分类删除新增按钮 */
+			$(".category dd dd .add-sub").remove();
+
+			/* 实时更新分类信息 */
+			$(".category")
+				.on("submit", "form", function(){
+					var self = $(this);
+					$.post(
+						self.attr("action"),
+						self.serialize(),
+						function(data){
+							/* 提示信息 */
+							var name = data.status ? "success" : "error", msg;
+							msg = self.find(".msg").addClass(name).text(data.info)
+									  .css("display", "inline-block");
+							setTimeout(function(){
+								msg.fadeOut(function(){
+									msg.text("").removeClass(name);
+								});
+							}, 1000);
+						},
+						"json"
+					);
+					return false;
+				})
+                .on("focus","input",function(){
+                    $(this).data('param',$(this).closest("form").serialize());
+
+                })
+                .on("blur", "input", function(){
+                    if($(this).data('param')!=$(this).closest("form").serialize()){
+                        $(this).closest("form").submit();
+                    }
+                });
+		})(jQuery);
+	</script>
 
 </body>
 </html>

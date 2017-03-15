@@ -1,0 +1,79 @@
+<extend name="Public/base"/>
+
+<block name="body">
+	<div class="main-title">
+		<h2>导航管理</h2>
+	</div>
+
+	<div class="cf">
+		<a class="btn" href="">删除</a>
+	</div>
+	<div class="data-table table-striped">
+		<table>
+			<thead>
+				<tr>
+					<th class="row-selected">
+						<input class="checkbox check-all" type="checkbox">
+					</th>
+					<th class="">申请人</th>
+					<th class="">活动名称</th>
+					<th class="">活动描述</th>
+					<th class="">结束时间</th>
+					<th class="">申请时间</th>
+					<th class="">状态</th>
+					<th class="">操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<notempty name="list">
+				<volist name="list" id="repair">
+
+					<tr>
+						<td><input class="ids row-selected" type="checkbox" name="" id="" value="{$repair['id']}"> </td>
+						<td>{$repair.name}</td>
+						<td>{$repair.title}</td>
+						<td>{$repair.description}</td>
+						<td>{$repair.deadline|time_format}</td>
+						<td>{$repair.create_time|time_format}</td>
+						<td>{$repair.status|getStatus}</td>
+						<td>
+							<if condition = "$repair.status eq 1"><a href="{:U('Active/status1?id='.$repair['id'])}">审核通过</a>
+								<a href="{:U('Active/status2?id='.$repair['id'])}">审核不通过</a>
+								<else /> </if>
+								<a class="btn" href="{:U('del?id='.$repair['id'])}">删 除</a>
+					</tr>
+				</volist>
+				<else/>
+				<td colspan="6" class="text-center"> aOh! 暂时还没有内容! </td>
+				</notempty>
+			</tbody>
+		</table>
+		<div class="page">
+			{$page}
+		</div>
+	</div>
+</block>
+
+<block name="script">
+<script type="text/javascript">
+    $(function() {
+    	//点击排序
+    	$('.list_sort').click(function(){
+    		var url = $(this).attr('url');
+    		var ids = $('.ids:checked');
+    		var param = '';
+    		if(ids.length > 0){
+    			var str = new Array();
+    			ids.each(function(){
+    				str.push($(this).val());
+    			});
+    			param = str.join(',');
+    		}
+
+    		if(url != undefined && url != ''){
+    			window.location.href = url + '/ids/' + param;
+    		}
+    	});
+    });
+</script>
+</block>

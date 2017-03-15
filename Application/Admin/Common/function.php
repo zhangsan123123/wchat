@@ -373,9 +373,9 @@ function get_action_type($type, $all = false){
 }
 function getStatus($status){
     $type = [
-      0=> '未处理',
-      1=> '正在处理',
-      2=> '已处理',
+      0=> '审核不通过',
+      1=> '待审核',
+      2=> '审核通过',
       -1=> '删除',
     ];
     return $type[$status];

@@ -1,13 +1,16 @@
 <extend name="Base/layout"/>
 <block name="body">
     <div class="main">
-        <div class="container-fluid">
+        <div class="container-fluid" id="content">
                 <volist name="list" id="estate">
             <div class="row noticeList">
-                <a href="notice-detail.html">
+                <a href="{:U('estate/detail?id='.$estate['id'])}">
                     <div class="col-xs-2">
                         <img class="noticeImg" src="{$estate.cover_id|get_cover ='path'}" />
                     </div>
+                    <form>
+                        <input type="hidden" name="{$estate.id}">
+                    </form>
                     <div class="col-xs-10">
                         <p class="title">{$estate.title}</p>
                         <p class="intro">{$estate.description}</p>
@@ -22,12 +25,33 @@
     </block>
 <block name="script">
         <script type="application/javascript">
+            var p= {:I('p',1)};
             $('.ajax-get-self').click(function(){
 
-
-
-            })
-
-            </script>
+                $.get('{:U()}',{'p':p+1},function(data){
+                    if(data){
+                        var html = '';
+                        $(data).each(function(i,e){
+                            html += ' <div class="row noticeList">\
+                                    <a href="{:U('estate/detail','',false)}/id/'+ e.id+'">\
+                                            <div class="col-xs-2">\
+                                            <img class="noticeImg" src="'+ e.path +'" />\
+                                            </div>\
+                                            <div class="col-xs-10">\
+                                            <p class="title">'+e.title+'</p>\
+                                <p class="intro">'+e.description+'</p>\
+                            <p class="info">浏览: '+e.view+' <span class="pull-right">'+ e.add_time+'</span> </p>\
+                </div>\
+                </a>\
+                </div>'
+                        });
+                        p += 1;
+                        $("#content").append(html);
+                    }else{
+                        $('.ajax-get-self').remove();
+                    }
+                })
+            });
+        </script>
 
 </block>
